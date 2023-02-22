@@ -8,15 +8,139 @@ namespace Colisiones
 {
     public class Ball
     {
-        public int radius;
+        public int radius, z;
+        public Brush b;
         public Point center;
         public Point speed;
+        public Point wind;
 
-        public Ball(int radius, Point position, Point velocity)
+        public Ball(int sel,Random rand, Rectangle bounds)
         {
-            this.radius = radius;
-            this.center = position;
-            this.speed = velocity;
+            wind=new Point(0,0);
+            if (sel == 0)
+                DeclareCollision(rand, bounds);
+            if (sel == 1)
+                DeclareRain(rand, bounds);
+            if (sel == 2)
+                DeclareFire(rand, bounds);
+            if (sel == 3)
+                DeclareSnow(rand, bounds);
+        }
+
+        public Ball(Point mouse, Random rand, Rectangle bounds)
+        {
+             DeclareFire(rand, bounds);
+        }
+
+        public void DeclareFire(Random rand, Rectangle bounds)
+        {
+            this.radius = rand.Next(15, 40);
+            this.center.X = rand.Next(bounds.Width / 2-5, bounds.Width/2+6);
+            this.center.Y = rand.Next(bounds.Height / 2-5 , bounds.Height/2+6);
+            this.speed.X = rand.Next(-3, 3);
+            this.speed.Y = rand.Next(-5, -3);
+            this.z = rand.Next(0, 4);
+            
+            if (z < 1)
+                b = new SolidBrush(Color.FromArgb(255, 255, rand.Next(0, 225), 0));
+            else if (z < 2)
+                b = new SolidBrush(Color.FromArgb(180, 255, rand.Next(0, 225), 0));
+            else if (z < 3)
+                b = new SolidBrush(Color.FromArgb(100, 255, rand.Next(0, 225), 0));
+            else if (z < 4)
+                b = new SolidBrush(Color.FromArgb(20, 255, rand.Next(0, 225), 0));
+        }
+
+        public void DeclareCollision(Random rand, Rectangle bounds)
+        {
+            this.radius = rand.Next(15, 40);
+            this.center.X = rand.Next(30, bounds.Width - 30);
+            this.center.Y = rand.Next(30, bounds.Height - 30);
+            this.speed.X = rand.Next(-20, 21);
+            this.speed.Y = rand.Next(-20, 21);
+            b = new SolidBrush(Color.FromArgb(255, rand.Next(0, 255), rand.Next(0, 255), rand.Next(0, 255)));
+        }
+
+        public void DeclareRain(Random rand, Rectangle bounds)
+        {
+            this.radius = rand.Next(15, 26);
+            this.center.X = rand.Next(0, bounds.Width);
+            this.center.Y = rand.Next(0, 3);
+            this.speed.X = rand.Next(-2, 3);
+            this.speed.Y = rand.Next(10, 30);
+            this.z = rand.Next(0, 4);
+        }
+
+        public void DeclareSnow(Random rand, Rectangle bounds)
+        {
+            this.radius = rand.Next(5, 15);
+            this.center.X = rand.Next(0, bounds.Width);
+            this.center.Y = rand.Next(0, 3);
+            this.speed.X = rand.Next(-2, 3);
+            this.speed.Y = rand.Next(5, 10);
+            this.z = rand.Next(0, 4);
+            b = new SolidBrush(Color.FromArgb(255, 255, 255, 255));
+        }
+
+        public void UpdateRain(Rectangle bounds, Random rand, int c)
+        {
+            this.center.Offset(this.speed);
+            if(c<250)
+                this.wind.X = rand.Next(-15, -7);
+            else
+                this.wind.X = rand.Next(7, 15);
+            this.center.Offset(this.wind);
+
+            if (this.center.Y > bounds.Bottom || this.center.X < bounds.Left || this.center.X > bounds.Right)
+            {
+                DeclareRain(rand, bounds);
+            }
+        }
+
+
+        public void UpdateParticle(Rectangle bounds, List<Ball> balls, Random rand, int sel)
+        {
+            this.center.Offset(this.speed);
+
+            // Check for collisions with walls
+            if (this.center.X + this.radius < bounds.Left || this.center.X - this.radius > bounds.Right)
+            {
+                if (sel == 2)
+                    DeclareFire(rand, bounds);
+                if (sel == 3)
+                    DeclareSnow(rand, bounds);
+            }
+            if (this.center.Y + this.radius < bounds.Top || this.center.Y - this.radius >= bounds.Bottom)
+            {
+                if (sel == 2)
+                    DeclareFire(rand, bounds);
+                if (sel == 3)
+                    DeclareSnow(rand, bounds);
+            }
+
+            // Check for collisions with other balls
+            foreach (var other in balls)
+            {
+                if (other.z == this.z)
+                {
+                    if (other != this && CheckCollision(this, other))
+                    {
+                        ResolveParticle(this, other);
+                    }
+                }
+            }
+        }
+
+        private static void ResolveParticle(Ball a, Ball b)
+        {
+            int dx = b.center.X - a.center.X;
+            int dy = b.center.Y - a.center.Y;
+            int dist = a.radius / 2 + b.radius / 2;
+            int overlap = dist - (int)Math.Sqrt(dx * dx + dy * dy);
+
+            // Move balls apart to resolve overlap
+            a.center.Offset(-overlap * dx / dist, -overlap * dy / dist);
+            b.center.Offset(overlap * dx / dist, overlap * dy / dist);
         }
 
         public void UpdatePosition(Rectangle bounds, List<Ball> balls)
