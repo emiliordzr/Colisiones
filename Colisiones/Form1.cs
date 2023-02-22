@@ -21,6 +21,7 @@ namespace Colisiones
         {
             InitializeComponent();
             random= new Random();
+            mousePos = new Point(0, 0);
             canvas = new Canvas(pictureBox1.Width, pictureBox1.Height);
             balls = new List<Ball>();
             bmp =new Bitmap(pictureBox1.Width, pictureBox1.Height);
@@ -41,7 +42,7 @@ namespace Colisiones
             rain = true;
             for (int i = 0; i < 500; i++)
             {
-                b = new Ball(sel, random, bounds);
+                b = new Ball(sel, random, bounds, mousePos);
                 balls.Add(b);
             }
         }
@@ -56,7 +57,7 @@ namespace Colisiones
             rain = false;
             for (int i = 0; i < 250; i++)
             {
-                b = new Ball(mousePos, random, bounds);
+                b = new Ball(sel, random, bounds, mousePos);
                 balls.Add(b);
             }
         }
@@ -71,7 +72,7 @@ namespace Colisiones
             rain = false;
             for (int i = 0; i < 300; i++)
             {
-                b = new Ball(sel, random, bounds);
+                b = new Ball(sel, random, bounds, mousePos);
                 balls.Add(b);
             }
         }
@@ -85,7 +86,7 @@ namespace Colisiones
             rain = false;
             for (int i = 0; i < 50; i++)
             {
-                b = new Ball(sel, random, bounds);
+                b = new Ball(sel, random, bounds, mousePos);
                 balls.Add(b);
             }
         }
@@ -161,12 +162,12 @@ namespace Colisiones
             if (fire)
             {
                 for (int i = 0; i < balls.Count; i++)
-                    balls[i].UpdateParticle(bounds, balls, random, sel);
+                    balls[i].UpdateParticle(bounds, balls, random, sel, mousePos);
             }
             if (snow)
             {
                 for (int i = 0; i < balls.Count; i++)
-                    balls[i].UpdateParticle(bounds, balls, random, sel);
+                    balls[i].UpdateParticle(bounds, balls, random, sel, mousePos);
             }
 
             Render();

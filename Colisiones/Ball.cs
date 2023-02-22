@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Devices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Colisiones
         public Point speed;
         public Point wind;
 
-        public Ball(int sel,Random rand, Rectangle bounds)
+        public Ball(int sel,Random rand, Rectangle bounds, Point mouse)
         {
             wind=new Point(0,0);
             if (sel == 0)
@@ -22,21 +23,16 @@ namespace Colisiones
             if (sel == 1)
                 DeclareRain(rand, bounds);
             if (sel == 2)
-                DeclareFire(rand, bounds);
+                DeclareFire(rand, bounds, mouse);
             if (sel == 3)
-                DeclareSnow(rand, bounds);
+                DeclareSnow(rand, bounds, mouse);
         }
 
-        public Ball(Point mouse, Random rand, Rectangle bounds)
-        {
-             DeclareFire(rand, bounds);
-        }
-
-        public void DeclareFire(Random rand, Rectangle bounds)
+        public void DeclareFire(Random rand, Rectangle bounds, Point mouse)
         {
             this.radius = rand.Next(15, 40);
-            this.center.X = rand.Next(bounds.Width / 2-5, bounds.Width/2+6);
-            this.center.Y = rand.Next(bounds.Height / 2-5 , bounds.Height/2+6);
+            this.center.X = rand.Next(mouse.X-5, mouse.X+6);
+            this.center.Y = rand.Next(mouse.Y-5 , mouse.Y+6);
             this.speed.X = rand.Next(-3, 3);
             this.speed.Y = rand.Next(-5, -3);
             this.z = rand.Next(0, 4);
@@ -71,11 +67,11 @@ namespace Colisiones
             this.z = rand.Next(0, 4);
         }
 
-        public void DeclareSnow(Random rand, Rectangle bounds)
+        public void DeclareSnow(Random rand, Rectangle bounds, Point mouse)
         {
             this.radius = rand.Next(5, 15);
-            this.center.X = rand.Next(0, bounds.Width);
-            this.center.Y = rand.Next(0, 3);
+            this.center.X = rand.Next(mouse.X-5, mouse.X+5);
+            this.center.Y = rand.Next(mouse.Y - 5, mouse.Y + 5);
             this.speed.X = rand.Next(-2, 3);
             this.speed.Y = rand.Next(5, 10);
             this.z = rand.Next(0, 4);
@@ -98,7 +94,7 @@ namespace Colisiones
         }
 
 
-        public void UpdateParticle(Rectangle bounds, List<Ball> balls, Random rand, int sel)
+        public void UpdateParticle(Rectangle bounds, List<Ball> balls, Random rand, int sel, Point mouse)
         {
             this.center.Offset(this.speed);
 
@@ -106,16 +102,16 @@ namespace Colisiones
             if (this.center.X + this.radius < bounds.Left || this.center.X - this.radius > bounds.Right)
             {
                 if (sel == 2)
-                    DeclareFire(rand, bounds);
+                    DeclareFire(rand, bounds, mouse);
                 if (sel == 3)
-                    DeclareSnow(rand, bounds);
+                    DeclareSnow(rand, bounds, mouse);
             }
             if (this.center.Y + this.radius < bounds.Top || this.center.Y - this.radius >= bounds.Bottom)
             {
                 if (sel == 2)
-                    DeclareFire(rand, bounds);
+                    DeclareFire(rand, bounds, mouse);
                 if (sel == 3)
-                    DeclareSnow(rand, bounds);
+                    DeclareSnow(rand, bounds, mouse);
             }
 
             // Check for collisions with other balls
