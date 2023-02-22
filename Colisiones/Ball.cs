@@ -69,7 +69,7 @@ namespace Colisiones
 
         public void DeclareSnow(Random rand, Rectangle bounds, Point mouse)
         {
-            this.radius = rand.Next(5, 15);
+            this.radius = rand.Next(10, 20);
             this.center.X = rand.Next(mouse.X-5, mouse.X+5);
             this.center.Y = rand.Next(mouse.Y - 5, mouse.Y + 5);
             this.speed.X = rand.Next(-2, 3);

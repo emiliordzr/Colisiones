@@ -137,7 +137,17 @@ namespace Colisiones
                 g.DrawImage(Resource1.bg, 0, 0, pictureBox1.Width, pictureBox1.Height);
                 for (int i = 0; i < balls.Count; i++)
                 {
-                    g.DrawImage(Resource1.copo_de_nieve2, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    if (balls[i].z < 1)
+                        g.DrawImage(Resource1.copo_de_nieve2, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    else if (balls[i].z < 2)
+                        g.DrawImage(Resource1.uno, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    else if (balls[i].z < 3)
+                        g.DrawImage(Resource1.dos, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    else if (balls[i].z < 4)
+                        g.DrawImage(Resource1.tres, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    else
+                        g.DrawImage(Resource1.copo_de_nieve2, balls[i].center.X, balls[i].center.Y, balls[i].radius, balls[i].radius);
+                    
                 }
             }
             
